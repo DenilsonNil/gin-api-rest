@@ -4,8 +4,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getAlunos(c *gin.Context) {
+	alunos := []string{"Ana", "Bruno", "Carla", "Daniel"}
+	c.JSON(200, gin.H{
+		"alunos": alunos,
+	})
+}
+
 func main() {
-	gin := gin.Default()
-	// gin.Run()
-	gin.Run(":5001")
+	r := gin.Default()
+	r.GET("/alunos", getAlunos)
+	r.Run(":5001")
 }
