@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/DenilsonNil/gin-api-rest/database"
 	"github.com/DenilsonNil/gin-api-rest/models"
 	"github.com/gin-gonic/gin"
@@ -45,4 +48,14 @@ func GetById(c *gin.Context) {
 		return
 	}
 	c.JSON(200, aluno)
+}
+
+func DeleteById(c *gin.Context) {
+	var aluno models.Aluno
+	id := c.Params.ByName("id")
+	fmt.Println("Delete aluno with id", id)
+	database.DB.Delete(&aluno, id)
+	c.JSON(http.StatusOK, gin.H{
+		"data": "Aluno deletado com sucesso!",
+	})
 }
