@@ -8,28 +8,41 @@ import (
 
 func CreateAluno(c *gin.Context) {
 	var aluno models.Aluno
+
 	if err := c.ShouldBindJSON(&aluno); err != nil {
 		c.JSON(400, gin.H{
 			"error": "Bad Request",
+			"cause": err.Error(),
 		})
 		return
 	}
 
-	database.DB.Create(&aluno)
+	if err := database.DB.Create(&aluno).Error; err != nil { // 👈 AQUI
+		c.JSON(500, gin.H{
+			"error": "Erro ao salvar no banco",
+			"cause": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(201, aluno)
 }
 
 func GetAlunos(c *gin.Context) {
-	// alunos := []string{"Ana", "Bruno", "Carla", "Daniel"}
-	c.JSON(200, gin.H{
-		"alunos": models.Alunos,
-	})
+	var alunos []models.Aluno
+	database.DB.Find(&alunos)
+	c.JSON(200, alunos)
 }
 
-func GetId(c *gin.Context) {
+func GetById(c *gin.Context) {
+	var aluno models.Aluno
 	id := c.Params.ByName("id")
-	c.JSON(200, gin.H{
-		"alunoId": id,
-	})
+	database.DB.First(&aluno, id)
+	if aluno.ID == 0 {
+		c.JSON(404, gin.H{
+			"NOT FOUND": "Aluno não encontrado",
+		})
+		return
+	}
+	c.JSON(200, aluno)
 }
